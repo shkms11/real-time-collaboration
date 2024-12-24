@@ -23,13 +23,30 @@ app.get('/', (req, res) => {
     res.send('Server is running');
 });
 
+// Middleware to handle errors
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
 
+// Set to store all room IDs
+const rooms = new Set();
+
 io.on('connection', (socket) => {
     console.log('New client connected');
+
+    // Event for creating a room
+    socket.on('createRoom', (roomId) => {
+        try {
+            socket.join(roomId);
+            rooms.add(roomId); // Add room ID to the set
+            io.emit('roomCreated', roomId); // Notify all clients about the new room
+            console.log(`Room created: ${roomId}`);
+        } catch (error) {
+            console.error(`Error creating room ${roomId}:`, error);
+            socket.emit('error', 'Error creating room');
+        }
+    });
 
     // Event for joining a room
     socket.on('join', (roomId) => {
@@ -63,6 +80,7 @@ io.on('connection', (socket) => {
 
             const room = io.sockets.adapter.rooms.get(roomId);
             if (!room) {
+                rooms.delete(roomId); // Remove room ID from the set if empty
                 io.emit('allUsersLeft', roomId);
                 console.log(`All users left room ${roomId}`);
             }
@@ -75,14 +93,15 @@ io.on('connection', (socket) => {
     // Event for leaving all rooms
     socket.on('leaveAll', () => {
         try {
-            const rooms = Array.from(socket.rooms).slice(1); // Exclude the socket ID room
-            rooms.forEach((roomId) => {
+            const socketRooms = Array.from(socket.rooms).slice(1); // Exclude the socket ID room
+            socketRooms.forEach((roomId) => {
                 socket.leave(roomId);
                 io.to(roomId).emit('userLeft', roomId);
                 console.log(`Client left room ${roomId}`);
 
                 const room = io.sockets.adapter.rooms.get(roomId);
                 if (!room) {
+                    rooms.delete(roomId); // Remove room ID from the set if empty
                     io.emit('allUsersLeft', roomId);
                     console.log(`All users left room ${roomId}`);
                 }
@@ -104,7 +123,7 @@ io.on('connection', (socket) => {
     });
 });
 
-
+// Start the server
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
