@@ -1,10 +1,15 @@
 import "./input.css";
+import { Provider } from "react-redux";
+import store from "./store";
+import RoomList from "./RoomList";
 
 function App() {
     return (
-        <div>
-            <h1 className="text-green-600">React App</h1>
-        </div>
+        <Provider store={store}>
+            <div className="App">
+                <RoomList />
+            </div>
+        </Provider>
     );
 }
 
