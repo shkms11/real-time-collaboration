@@ -40,6 +40,9 @@ const checkRoomExists = (roomId) => {
 io.on('connection', (socket) => {
     console.log('New client connected');
 
+    // Send the list of existing rooms to the new client
+    socket.emit('existingRooms', Array.from(rooms));
+
     // Event for creating a room
     socket.on('createRoom', (roomId) => {
         try {
