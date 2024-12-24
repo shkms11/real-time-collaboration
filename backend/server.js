@@ -32,12 +32,21 @@ app.use((err, req, res, next) => {
 // Set to store all room IDs
 const rooms = new Set();
 
+// Function to check if a room exists
+const checkRoomExists = (roomId) => {
+    return rooms.has(roomId);
+};
+
 io.on('connection', (socket) => {
     console.log('New client connected');
 
     // Event for creating a room
     socket.on('createRoom', (roomId) => {
         try {
+            if (checkRoomExists(roomId)) {
+                socket.emit('error', 'Room already exists');
+                return;
+            }
             socket.join(roomId);
             rooms.add(roomId); // Add room ID to the set
             io.emit('roomCreated', roomId); // Notify all clients about the new room
@@ -51,6 +60,10 @@ io.on('connection', (socket) => {
     // Event for joining a room
     socket.on('join', (roomId) => {
         try {
+            if (!checkRoomExists(roomId)) {
+                socket.emit('error', 'Room does not exist');
+                return;
+            }
             socket.join(roomId);
             io.to(roomId).emit('newUserJoined', roomId);
             console.log(`Client joined room ${roomId}`);
