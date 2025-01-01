@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { selectCurrentRoomId } from "./socketSlice";
-import io from "socket.io-client";
-
-const socket = io("http://localhost:5000");
+import { selectCurrentRoomId } from "./redux/socketSlice";
+import { socket } from "./api";
 
 const Chat: React.FC = () => {
     const [message, setMessage] = useState<string>("");
