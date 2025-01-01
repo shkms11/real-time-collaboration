@@ -1,3 +1,4 @@
+import "./input.css";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getRooms, createRoom, joinRoom, leaveRoom, socket } from "./api";
@@ -78,26 +79,43 @@ const Room = () => {
     };
 
     return (
-        <div>
-            <h1>Real-Time Collaboration Test</h1>
-            <div>
-                <h2>Rooms</h2>
-                <ul>
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">
+                Real-Time Collaboration Test
+            </h1>
+            <div className="mb-4">
+                <h2 className="text-xl font-semibold mb-2">Rooms</h2>
+                <ul className="list-disc pl-5">
                     {rooms.map((room) => (
-                        <li key={room}>
+                        <li key={room} className="mb-2">
                             {room}
-                            <button onClick={() => handleJoinRoom(room)}>
+                            <button
+                                className="ml-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-700"
+                                onClick={() => handleJoinRoom(room)}
+                            >
                                 Join
                             </button>
                         </li>
                     ))}
                 </ul>
-                <button onClick={handleCreateRoom}>Create Room</button>
+                <button
+                    className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+                    onClick={handleCreateRoom}
+                >
+                    Create Room
+                </button>
             </div>
             {currentRoomId && (
-                <div>
-                    <h2>Current Room: {currentRoomId}</h2>
-                    <button onClick={handleLeaveRoom}>Leave Room</button>
+                <div className="mt-4">
+                    <h2 className="text-xl font-semibold mb-2">
+                        Current Room: {currentRoomId}
+                    </h2>
+                    <button
+                        className="mb-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+                        onClick={handleLeaveRoom}
+                    >
+                        Leave Room
+                    </button>
                     <Chat />
                 </div>
             )}
